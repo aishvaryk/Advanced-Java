@@ -61,9 +61,12 @@ public class Bank {
 
 	public BankAccount getAccount(int accountNumber, String password) {
 		// TODO Auto-generated method stub
+		
+		BankAccount account = accounts[accountNumber];
 		if(!account.authenticate(password))
-			return -1;
-		return accounts[accountNumber];
+			return null;
+		return account;
+		
 	}
 
 	
