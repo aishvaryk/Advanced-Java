@@ -1,4 +1,4 @@
-package in.bank;
+package in.bank.banking;
 
 public enum ResponseStatus {
 	

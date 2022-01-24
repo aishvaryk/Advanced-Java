@@ -1,4 +1,4 @@
-package in.bank;
+package in.bank.banking;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
