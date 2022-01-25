@@ -49,7 +49,6 @@ public class BankAccount {
 			isOverDrafting =  BankAccountTypes.CurrentAccount.isOverDrafting();
 			overDraftingFees = BankAccountTypes.ODAccount.getOverDraftingFees();
 		}
-		
 				
 	}
 	
@@ -80,7 +79,7 @@ public class BankAccount {
 	public Response withdraw(double amount) {
 		if(amount<0)
 			return new Response(ResponseStatus.INVALID_AMOUNT,"Enter Positive Amount");
-		if(amount>balance)
+		if(amount>balance-minimumBalance)
 			return new Response(ResponseStatus.INSUFFICIENT_FUNDS,"Insufficient Funds");
 		
 
