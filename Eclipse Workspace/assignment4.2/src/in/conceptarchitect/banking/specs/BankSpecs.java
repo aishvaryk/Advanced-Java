@@ -299,11 +299,11 @@ public class BankSpecs {
 	
 	@Test
 	public void withdrawShouldReduceBalanceByAmountOnSuccess() {
-
 		var accNo= bank.openAccount("A", correctPassword, initialBalance,accountType); 
 		var expectedResponse = new Response(ResponseStatus.SUCCESS,"").getCode();
-		
-		assertEquals(expectedResponse, bank.withdraw(accNo,correctPassword, 1).getCode());
+		var resultResponse = bank.withdraw(accNo,correctPassword, 1).getCode();
+		assertEquals(expectedResponse, resultResponse);
+		assertEquals(initialBalance-1, bank.getAccountBalance(accNo, correctPassword),0.1);
 	}
 	
 	@Test
