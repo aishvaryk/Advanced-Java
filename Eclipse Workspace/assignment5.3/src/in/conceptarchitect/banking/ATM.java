@@ -35,12 +35,51 @@ public class ATM {
 				case 0:
 					return ;
 					
+				case 1:
+					accountMenu();
+				
+				case 2:
+					bank.creditInterest();
+					
+				case 3:
+					bank.getAccounts();
+				
+					
 				default:
 					showError("invalid choice. retry");
 			}
 		}
 	}
 
+	
+	private void accountMenu() {
+		while(true) {
+		
+
+			var name =keyboard.readString("Name?");
+			var password=keyboard.readString("password?");
+			var amount = keyboard.readInt("Initial Amount?");
+			var choice=keyboard.readInt("1. Savings Account 2. Current Account 3. view all accounts 0. exit ?");
+			switch(choice) {
+				case 0:
+					return ;
+					
+				case 1:
+					bank.openAccount(name, password, amount, "savings");
+					
+				case 2:
+					bank.openAccount(name, password, amount, "current");
+					
+				case 3:
+					bank.openAccount(name, password, amount, "overdraft");
+					
+				default:
+					showError("invalid choice. retry");
+		}
+		
+		}
+		
+	}
 	private void mainMenu() {
 		
 		while(true) {

@@ -27,7 +27,11 @@ public class Bank {
 	int accountCount=0;	
 	int lastAccountNumber=0;
 	BankAccount [] accounts=new BankAccount[100];
+	
 
+	public BankAccount[] getAccounts() {
+		return accounts;
+	}
 
 	public int openAccount(String name, String password, double amount, String accountType) {
 		// TODO Auto-generated method stub
