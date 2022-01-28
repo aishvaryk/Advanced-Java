@@ -1,5 +1,9 @@
-package in.conceptarchitect.banking;
+package in.conceptarchitect.banking.frontend;
 
+import in.conceptarchitect.banking.Bank;
+import in.conceptarchitect.banking.Response;
+import in.conceptarchitect.banking.ResponseStatus;
+import in.conceptarchitect.exceptions.*;
 import in.conceptarchitect.utils.Input;
 
 public class ATM {
@@ -16,13 +20,18 @@ public class ATM {
 	}
 	
 	public void start() {
-		accountNumber=keyboard.readInt("account number?");
-		password=keyboard.readString("password?");
-		//A secret menu
-		if(accountNumber==-1 && password=="NIMDA")
-			adminMenu();
-		else
-			mainMenu();
+		
+		while(true) {
+		
+			accountNumber=keyboard.readInt("account number?");
+			password=keyboard.readString("password?");
+			//A secret menu
+			if(accountNumber==-1 && password.equals("NIMDA"))
+				adminMenu();
+			else
+				mainMenu();
+		}			
+	
 	}
 	
 	
@@ -30,20 +39,24 @@ public class ATM {
 	private void adminMenu() {
 		// TODO Auto-generated method stub
 		while(true) {
-			var choice=keyboard.readInt("1. open account 2. credit interest 3. view all accounts 0. exit ?");
+			var choice=keyboard.readInt("1. open account 2. credit interest 3. view all accounts 4. shutdown atm 0. exit ?");
 			switch(choice) {
 				case 0:
 					return ;
 					
 				case 1:
-					accountMenu();
-				
-				case 2:
-					bank.creditInterest();
+					doOpenAccount();
+					break;
 					
+				case 2:
+					creditInterests();
+					break;
 				case 3:
-					bank.getAccounts();
-				
+					doViewAccounts();
+					break;
+					
+				case 4:
+					doShutdownAtm();
 					
 				default:
 					showError("invalid choice. retry");
@@ -51,35 +64,47 @@ public class ATM {
 		}
 	}
 
-	
-	private void accountMenu() {
-		while(true) {
+	private void doShutdownAtm() {
+		// TODO Auto-generated method stub
+		System.exit(0); //standard java function to exit application
 		
+	}
 
-			var name =keyboard.readString("Name?");
-			var password=keyboard.readString("password?");
-			var amount = keyboard.readInt("Initial Amount?");
-			var choice=keyboard.readInt("1. Savings Account 2. Current Account 3. Overdraft 0. exit ?");
-			switch(choice) {
-				case 0:
-					return ;
-					
-				case 1:
-					bank.openAccount(name, password, amount, "savings");
-					
-				case 2:
-					bank.openAccount(name, password, amount, "current");
-					
-				case 3:
-					bank.openAccount(name, password, amount, "overdraft");
-					
-				default:
-					showError("invalid choice. retry");
-		}
-		
+	private void doViewAccounts() {
+		// TODO Auto-generated method stub
+		String [] accountsInfo= bank.getAllAccountsInfo();
+		for(var info :accountsInfo) {
+			showInfo(String.format(info));
 		}
 		
 	}
+
+	private void creditInterests() {
+		// TODO Auto-generated method stub
+		bank.creditInterest();
+		
+	}
+
+	private void doOpenAccount() {
+		// TODO Auto-generated method stub
+		String accountType=keyboard.readString("account type: savings/current/overdraft ?");
+		String name= keyboard.readString("name?");
+		String password=keyboard.readString("password?");
+		int amount=keyboard.readInt("Amount?");
+		
+		try {
+			var response= bank.openAccount(accountType, name, password, amount);
+			if(response!=-1)
+				showInfo("You account number is "+response);
+			else
+				showError("Invalid Account Type selected");
+		}
+		catch(InvalidAmountException e) {
+			showError(e.getMessage());
+		}
+		
+	}
+
 	private void mainMenu() {
 		
 		while(true) {
@@ -102,7 +127,7 @@ public class ATM {
 				
 			case 5:
 				doCloseAccount();
-				break;
+				return;
 				
 			case 0:
 				return ;
@@ -121,14 +146,15 @@ public class ATM {
 
 	private void doCloseAccount() {
 		// TODO Auto-generated method stub
-		
+		bank.closeAccount(accountNumber, password);
+		return;
 	}
 
 	private void doTransfer() {
 		// TODO Auto-generated method stub
 		int amount=keyboard.readInt("amount?");
 		int targetAccount=keyboard.readInt("target account?");
-		Response response= bank.transfer(accountNumber,password, targetAccount, amount );
+		Response response= bank.transfer(accountNumber, amount, password, targetAccount);
 		if(response.getCode()==ResponseStatus.SUCCESS) {
 			showInfo("Amount Transferred Successfully");
 		} else {
@@ -152,11 +178,14 @@ public class ATM {
 	private void doWithdraw() {
 		// TODO Auto-generated method stub
 		int amount=keyboard.readInt("Amount to withdraw?");
-		Response result= bank.withdraw(accountNumber,  password,amount);
+		try {
+		Response result= bank.withdraw(accountNumber, amount, password);
 		if(result.getCode()==ResponseStatus.SUCCESS)
 			dispenseCash(amount);
-		else
-			showError(result.getMessage());
+		}
+		catch(Exception e) {
+			showError(e.getMessage());
+		}
 		
 	}
 
@@ -167,16 +196,20 @@ public class ATM {
 
 	private void doDeposit() {
 		// TODO Auto-generated method stub
-		int amount=keyboard.readInt("Deposit Amount?"); //ATM allows only whole sum (actually multiple of 100)
+		int amount=keyboard.readInt("Deposit Amount?"); //ATM allows only whole sum (actully multiple of 100)
 		if(amount%100!=0) {
 			showError("Invalid Denomination");
 			return ;
 		}
 		
-		if(bank.deposit(accountNumber, amount).getCode()==ResponseStatus.SUCCESS)
-			showInfo("Amount deposited");
-		else
-			showInfo("Deposit failed");
+		try{
+		bank.deposit(accountNumber, amount);
+		showInfo("Amount deposited");
+		}
+		catch (InvalidAmountException e) {
+			showError(e.getMessage());
+		}
+			
 		
 		
 	}
@@ -188,3 +221,4 @@ public class ATM {
 	
 	
 }
+ 

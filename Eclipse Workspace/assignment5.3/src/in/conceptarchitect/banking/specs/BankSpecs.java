@@ -130,8 +130,7 @@ public class BankSpecs {
 		assertNotEquals(-1, result,0);
 	}
 	
-	
-	@Ignore
+
 	@Test
 	public void closeAccountShouldReturnBalanceOnSuccessfulClosure() {
 		
