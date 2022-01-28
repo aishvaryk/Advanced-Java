@@ -141,10 +141,7 @@ public class Bank {
 		var account=getAccount(accountNumber);
 		
 		account.authenticate(password);
-		if(account!=null)
-				return account.getBalance();
-		else
-			return -1;
+		return account.getBalance();
 	}
 
 	

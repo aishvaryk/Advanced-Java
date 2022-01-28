@@ -2,9 +2,7 @@ package in.conceptarchitect.banking.specs;
 
 import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -96,7 +94,7 @@ public class BankSpecs {
 		
 		
 		// ACT 
-		var accountNumber1 = bank.openAccount("savings","aman", "mypassword", 1000.0 );
+		bank.openAccount("savings","aman", "mypassword", 1000.0 );
 		
 		
 		// ASSERT
@@ -206,7 +204,7 @@ public class BankSpecs {
 	@Test
 	public void closeAccountShouldReduceTheAccountCountInTheBank() {
 		//ACT
-		var result= bank.closeAccount(savingsAccountNumber, correctPassword);
+		bank.closeAccount(savingsAccountNumber, correctPassword);
 		
 		//ASSERT
 		assertEquals(initialTotalAccounts-1, bank.getAccountCount());
@@ -262,10 +260,7 @@ public class BankSpecs {
 	public void weShouldNotBeAbleToGetClosedAccount() {
 		var amount=bank.closeAccount(currentAccountNumber, correctPassword);
 		assumeTrue(amount==initialBalance); //our account is indeed closed
-		
-		var account=bank.getAccount(currentAccountNumber, correctPassword);
-		
-		assertNull(account); //account returned must be null
+		bank.getAccount(currentAccountNumber, correctPassword);
 	}
 	
 	
@@ -338,18 +333,16 @@ public class BankSpecs {
 		//Arrange
 		bank.closeAccount(savingsAccountNumber, correctPassword);
 		//Act
-		double balance=bank.getBalance(savingsAccountNumber, correctPassword);
-		//Assert
-		assertEquals(-1, balance,0);
+		bank.getBalance(savingsAccountNumber, correctPassword);
+		//Assert\
 	}
 	
 	
 	
 	@Test(expected= InvalidAccountNumberException.class)
 	public void depositShouldFailForInvalidAccountNumber() {
-		boolean result= bank.deposit(initialTotalAccounts+1, 20000);
+		bank.deposit(initialTotalAccounts+1, 20000);
 		
-		assertFalse(result);
 	}
 	
 	@Test(expected= InvalidAmountException.class)
@@ -369,18 +362,15 @@ public class BankSpecs {
 	
 	@Test(expected= InvalidAccountNumberException.class)
 	public void withdrawShouldFailForInvalidAccountNumber() {
-		Response response= bank.withdraw(initialTotalAccounts+1, 1, correctPassword);
+		bank.withdraw(initialTotalAccounts+1, 1, correctPassword);
 
-		assertEquals(ResponseStatus.INVALID_ACCOUNT, response.getCode());
 	}
 	
 	@Test(expected= InvalidCredentialsException.class)
 	public void withdrawShouldFailForInvalidPassword() {
 	
-		var response= bank.withdraw(savingsAccountNumber, 1, "not-"+correctPassword);
+		bank.withdraw(savingsAccountNumber, 1, "not-"+correctPassword);
 
-		assertEquals(ResponseStatus.INVALID_CREDENTIALS,response.getCode());
-		bankAsserts.assertBalanceUnchanged(savingsAccountNumber);
 	}
 
 	@Test(expected= InvalidAmountException.class)
@@ -392,7 +382,7 @@ public class BankSpecs {
 	public void withdrawShouldFailForAmountExceedMinBalanceInSavingsAccount() {
 		SavingsAccount account=(SavingsAccount) bank.getAccount(savingsAccountNumber, correctPassword);
 		bank.withdraw(savingsAccountNumber, initialBalance-account.getMinBalance()+1, correctPassword);
-		}
+	}
 	
 
 	@Test(expected= InsufficientFundsException.class)
@@ -400,7 +390,6 @@ public class BankSpecs {
 		var toWithdraw= initialBalance + 1;
 		
 		bank.withdraw(currentAccountNumber, toWithdraw, correctPassword);
-		bankAsserts.assertBalanceUnchanged(currentAccountNumber);
 		
 	}
 	
@@ -427,22 +416,16 @@ public class BankSpecs {
 	
 	@Test(expected= InvalidAccountNumberException.class)
 	public void transferShouldFailForInvalidSourceAccountNumber() {
-		var response= bank.transfer(initialTotalAccounts+1, 1, correctPassword, savingsAccountNumber);
+		bank.transfer(initialTotalAccounts+1, 1, correctPassword, savingsAccountNumber);
 		
-		assertEquals(ResponseStatus.INVALID_ACCOUNT,response.getCode());
-		assertEquals("Invalid Source Account",response.getMessage());
-		bankAsserts.assertBalanceUnchanged(savingsAccountNumber);
 		
 		
 	}
 	
 	@Test(expected= InvalidAccountNumberException.class)
 	public void transferShouldFailForInvalidTargetAccountNumber() {
-		var response= bank.transfer(savingsAccountNumber, 1, correctPassword, initialTotalAccounts+1);
+		bank.transfer(savingsAccountNumber, 1, correctPassword, initialTotalAccounts+1);
 		
-		assertEquals(ResponseStatus.INVALID_ACCOUNT,response.getCode());
-		assertEquals("Invalid Target Account",response.getMessage());
-		bankAsserts.assertBalanceUnchanged(savingsAccountNumber);
 		
 	}
 	
@@ -516,20 +499,16 @@ public class BankSpecs {
 	@Test(expected= InvalidCredentialsException.class) 
 	public void changePasswordFailsForInvalidCurrentPassword() {
 		String newPassword="new password";
-		var result=bank.changePassword(savingsAccountNumber, "not"+correctPassword, newPassword);
-		
-		assertEquals(ResponseStatus.INVALID_CREDENTIALS,result.getCode());
-		//how do I know password is actually changed
+		bank.changePassword(savingsAccountNumber, "not"+correctPassword, newPassword);
+	
 	}
 	
 	
 	@Test(expected= InvalidAccountNumberException.class)
 	public void changePasswordFailsForInvalidAccountNumber() {
 		String newPassword="new password";
-		var result=bank.changePassword(-1, "not"+correctPassword, newPassword);
+		bank.changePassword(-1, "not"+correctPassword, newPassword);
 		
-		assertEquals(ResponseStatus.INVALID_ACCOUNT,result.getCode());
-		//how do I know password is actually changed
 	}
 	
 	
