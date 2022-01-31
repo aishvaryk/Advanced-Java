@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import in.conceptarchitect.banking.BankAccount;
 import in.conceptarchitect.banking.OverdraftAccount;
-import in.conceptarchitect.banking.ResponseStatus;
+import in.conceptarchitect.banking.exceptions.InvalidCredentialsException;
 
 public class OverdraftAccountSpecs {
 	String name="Name";
@@ -121,9 +121,7 @@ public class OverdraftAccountSpecs {
 		
 		var withdraw= balance+odLimit/2;		//52500
 		
-		var result=account.withdraw(withdraw, correctPassword);
-		
-		assertEquals(ResponseStatus.SUCCESS,result.getCode());
+		account.withdraw(withdraw, correctPassword);
 		
 		assertTrue(account.getBalance()<0);
 		
@@ -139,21 +137,18 @@ public class OverdraftAccountSpecs {
 		
 		var finalBalance= od+odCharge; // -2525
 		
-		var result=account.withdraw(withdraw, correctPassword);
+		account.withdraw(withdraw, correctPassword);
 		
-		assertEquals(ResponseStatus.SUCCESS,result.getCode());
 		
 		assertEquals(finalBalance, account.getBalance(),0.01);
 	}
 	
 	
 	
-	@Test
+
+	@Test(expected= InvalidCredentialsException.class)
 	public void withdrawFailsForWrongPassword() {
-		var result= account.withdraw(1, "not-"+correctPassword);
-		
-		assertEquals(ResponseStatus.INVALID_CREDENTIALS, result.getCode());
-		assertEquals(balance, account.getBalance(),0);
+		account.withdraw(1, "not-"+correctPassword);
 		
 	}
 	
